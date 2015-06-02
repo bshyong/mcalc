@@ -102,9 +102,8 @@ var styles = StyleSheet.create({
     padding: 10,
   },
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginTop: 65,
+    paddingTop: 20,
     backgroundColor: '#F5FCFF',
   },
   navBar: {
