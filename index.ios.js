@@ -14,10 +14,8 @@ var {
 class TextInputWithLabel extends React.Component {
   render() {
     return (
-      <View style={styles.labelContainer}>
-        <View style={styles.label}>
-          <Text>{this.props.label}</Text>
-        </View>
+      <View style={{width: this.props.width}}>
+        <Text>{this.props.label}</Text>
         {this.props.children}
       </View>
     )
@@ -32,59 +30,82 @@ class Index extends React.Component {
       shipping: 0,
       taxRate: 0,
       subTotal: 0,
+      listingPrice: 0,
+      profit: 0,
+      tax: 0
     }
   }
 
   calculateBalances() {
     var subTotal = this.state.cost * (1.0 + this.state.taxRate / 100.0) + this.state.shipping
     this.setState({
-      subTotal: subTotal
+      tax: this.state.taxRate / 100.0 * this.state.cost,
+      subTotal: subTotal,
+      profit: this.state.listingPrice - subTotal
     })
+  }
+
+  renderRoundedNumber(num) {
+    return Math.round(num * 100) / 100
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <TextInputWithLabel label="Item cost">
-          <TextInput
-            style={styles.inputField}
-            placeholder=''
-            autoCorrect={false}
-            keyboardType='decimal-pad'
-            onChangeText={text => this.setState({cost: parseFloat(text || 0)},this.calculateBalances)} />
-        </TextInputWithLabel>
-        <TextInputWithLabel label="Tax Rate">
-          <TextInput
-            style={styles.inputField}
-            placeholder=''
-            autoCorrect={false}
-            keyboardType='decimal-pad'
-            onChangeText={text => this.setState({taxRate: parseFloat(text || 0)},this.calculateBalances)} />
-        </TextInputWithLabel>
-        <TextInputWithLabel label="Shipping cost">
-          <TextInput
-            style={styles.inputField}
-            placeholder=''
-            autoCorrect={false}
-            keyboardType='decimal-pad'
-            onChangeText={text => this.setState({shipping: parseFloat(text || 0)},this.calculateBalances)} />
-        </TextInputWithLabel>
-        <View style={styles.subtotal}>
-          <Text>
-            Subtotal ${this.state.subTotal}
-          </Text>
+        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', marginBottom: 10}}>
+          <TextInputWithLabel label="Item cost" width={75}>
+            <TextInput
+              style={styles.textfield}
+              placeholder=''
+              autoCorrect={false}
+              keyboardType='decimal-pad'
+              onChangeText={text => this.setState({cost: parseFloat(text || 0)},this.calculateBalances)} />
+            <Text style={{textAlign: 'center'}}>${this.renderRoundedNumber(this.state.cost)}</Text>
+          </TextInputWithLabel>
+          <TextInputWithLabel label="Tax Rate %" width={75}>
+            <TextInput
+              style={styles.textfield}
+              placeholder=''
+              autoCorrect={false}
+              keyboardType='decimal-pad'
+              onChangeText={text => this.setState({taxRate: parseFloat(text || 0)},this.calculateBalances)} />
+            <Text style={{textAlign: 'center'}}>${this.renderRoundedNumber(this.state.tax)}</Text>
+          </TextInputWithLabel>
+          <TextInputWithLabel label="Shipping" width={75}>
+            <TextInput
+              style={styles.textfield}
+              placeholder=''
+              autoCorrect={false}
+              keyboardType='decimal-pad'
+              onChangeText={text => this.setState({shipping: parseFloat(text || 0)},this.calculateBalances)} />
+            <Text style={{textAlign: 'center'}}>${this.renderRoundedNumber(this.state.shipping)}</Text>
+          </TextInputWithLabel>
+          <TextInputWithLabel label="List Price" width={75}>
+            <TextInput
+              style={styles.textfield}
+              placeholder=''
+              autoCorrect={false}
+              keyboardType='decimal-pad'
+              onChangeText={text => this.setState({listingPrice: parseFloat(text || 0)},this.calculateBalances)} />
+            <Text style={{textAlign: 'center'}}>${this.renderRoundedNumber(this.state.listingPrice)}</Text>
+          </TextInputWithLabel>
         </View>
-        <TextInputWithLabel label="Listing price">
-          <TextInput
-            style={styles.inputField}
-            placeholder=''
-            autoCorrect={false}
-            keyboardType='decimal-pad' />
-        </TextInputWithLabel>
-        <View style={styles.profit}>
-          <Text>
-            Profit
-          </Text>
+        <View style={styles.totalView}>
+          <View style={styles.tallyView}>
+            <Text style={{fontWeight: 'bold'}}>
+              Total Cost
+            </Text>
+            <Text style={{fontSize: 24}}>${this.renderRoundedNumber(this.state.subTotal)}</Text>
+          </View>
+          <View style={styles.tallyView}>
+            <Text style={{fontWeight: 'bold'}}>
+              Profit
+            </Text>
+            <Text style={{fontSize: 24, textAlign: 'right'}}>${this.renderRoundedNumber(this.state.profit)}</Text>
+            <Text style={{textAlign: 'right'}}>
+              {this.renderRoundedNumber((this.state.profit * 100.0 / this.state.subTotal) || 0)}%
+            </Text>
+          </View>
         </View>
       </View>
     )
@@ -92,34 +113,28 @@ class Index extends React.Component {
 }
 
 var styles = StyleSheet.create({
-  subtotal: {
-    textAlign: 'left',
-    alignSelf: 'stretch',
-    marginLeft: 10,
-    paddingTop: 5,
-    marginBottom: 20,
-    borderTopColor: '#999',
-    borderTopWidth: 2,
-  },
-  profit: {
-    textAlign: 'left',
-    alignSelf: 'stretch',
-    marginLeft: 10,
-    paddingTop: 5,
-    marginBottom: 20,
-    borderTopColor: '#999',
-    borderTopWidth: 2,
-  },
-  inputField: {
+  textfield: {
     height: 36,
-    flexDirection: 'row',
-    justifyContent: 'center',
     alignSelf: 'stretch',
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 8,
     borderColor: '#eeeeee',
-    margin: 5,
+    padding: 5,
+  },
+  totalView: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignSelf: 'stretch',
+    borderTopColor: '#999',
+    borderTopWidth: 2,
     padding: 10,
+    margin: 10,
+    marginBottom: 20,
+  },
+  tallyView: {
+    textAlign: 'left',
+    padding: 5
   },
   container: {
     marginTop: 65,
@@ -130,24 +145,6 @@ var styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     color: '#333333',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-  labelContainer: {
-    marginBottom: 5,
-  },
-  label: {
-    width: 240,
-    textAlign: 'left',
-    paddingLeft: 10,
   },
 });
 
