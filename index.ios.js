@@ -25,6 +25,23 @@ class TextInputWithLabel extends React.Component {
 }
 
 class Index extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      cost: 0,
+      shipping: 0,
+      taxRate: 0,
+      subTotal: 0,
+    }
+  }
+
+  calculateBalances() {
+    var subTotal = this.state.cost * (1.0 + this.state.taxRate / 100.0) + this.state.shipping
+    this.setState({
+      subTotal: subTotal
+    })
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -33,25 +50,28 @@ class Index extends React.Component {
             style={styles.inputField}
             placeholder=''
             autoCorrect={false}
-            keyboardType='decimal-pad' />
+            keyboardType='decimal-pad'
+            onChangeText={text => this.setState({cost: parseFloat(text || 0)},this.calculateBalances)} />
         </TextInputWithLabel>
         <TextInputWithLabel label="Tax Rate">
           <TextInput
             style={styles.inputField}
             placeholder=''
             autoCorrect={false}
-            keyboardType='decimal-pad' />
+            keyboardType='decimal-pad'
+            onChangeText={text => this.setState({taxRate: parseFloat(text || 0)},this.calculateBalances)} />
         </TextInputWithLabel>
         <TextInputWithLabel label="Shipping cost">
           <TextInput
             style={styles.inputField}
             placeholder=''
             autoCorrect={false}
-            keyboardType='decimal-pad' />
+            keyboardType='decimal-pad'
+            onChangeText={text => this.setState({shipping: parseFloat(text || 0)},this.calculateBalances)} />
         </TextInputWithLabel>
-        <View  style={styles.subtotal}>
+        <View style={styles.subtotal}>
           <Text>
-            Subtotal
+            Subtotal ${this.state.subTotal}
           </Text>
         </View>
         <TextInputWithLabel label="Listing price">
