@@ -25,6 +25,7 @@ class TextInputWithLabel extends React.Component {
 class Index extends React.Component {
   constructor(props) {
     super(props)
+    this.exchangeRate = 6.0
     this.state = {
       cost: 0,
       shipping: 0,
@@ -32,7 +33,8 @@ class Index extends React.Component {
       subTotal: 0,
       listingPrice: 0,
       profit: 0,
-      tax: 0
+      tax: 0,
+      exchangeRate: this.exchangeRate,
     }
   }
 
@@ -41,8 +43,13 @@ class Index extends React.Component {
     this.setState({
       tax: this.state.taxRate / 100.0 * this.state.cost,
       subTotal: subTotal,
-      profit: this.state.listingPrice - subTotal
+      profit: this.state.listingPrice - subTotal,
+      rmbCost: subTotal * (this.state.exchangeRate || this.exchangeRate)
     })
+  }
+
+  renderRmbAmount(num) {
+    return this.renderRoundedNumber(num * this.state.exchangeRate)
   }
 
   renderRoundedNumber(num) {
@@ -52,7 +59,7 @@ class Index extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', marginBottom: 10}}>
+        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
           <TextInputWithLabel label="Item cost" width={75}>
             <TextInput
               style={styles.textfield}
@@ -61,6 +68,7 @@ class Index extends React.Component {
               keyboardType='decimal-pad'
               onChangeText={text => this.setState({cost: parseFloat(text || 0)},this.calculateBalances)} />
             <Text style={{textAlign: 'center'}}>${this.renderRoundedNumber(this.state.cost)}</Text>
+            <Text style={{textAlign: 'center'}}>¥{this.renderRmbAmount(this.state.cost)}</Text>
           </TextInputWithLabel>
           <TextInputWithLabel label="Tax Rate %" width={75}>
             <TextInput
@@ -70,6 +78,7 @@ class Index extends React.Component {
               keyboardType='decimal-pad'
               onChangeText={text => this.setState({taxRate: parseFloat(text || 0)},this.calculateBalances)} />
             <Text style={{textAlign: 'center'}}>${this.renderRoundedNumber(this.state.tax)}</Text>
+            <Text style={{textAlign: 'center'}}>¥{this.renderRmbAmount(this.state.tax)}</Text>
           </TextInputWithLabel>
           <TextInputWithLabel label="Shipping" width={75}>
             <TextInput
@@ -79,6 +88,7 @@ class Index extends React.Component {
               keyboardType='decimal-pad'
               onChangeText={text => this.setState({shipping: parseFloat(text || 0)},this.calculateBalances)} />
             <Text style={{textAlign: 'center'}}>${this.renderRoundedNumber(this.state.shipping)}</Text>
+            <Text style={{textAlign: 'center'}}>¥{this.renderRmbAmount(this.state.shipping)}</Text>
           </TextInputWithLabel>
           <TextInputWithLabel label="List Price" width={75}>
             <TextInput
@@ -88,6 +98,7 @@ class Index extends React.Component {
               keyboardType='decimal-pad'
               onChangeText={text => this.setState({listingPrice: parseFloat(text || 0)},this.calculateBalances)} />
             <Text style={{textAlign: 'center'}}>${this.renderRoundedNumber(this.state.listingPrice)}</Text>
+            <Text style={{textAlign: 'center'}}>¥{this.renderRmbAmount(this.state.listingPrice)}</Text>
           </TextInputWithLabel>
         </View>
         <View style={styles.totalView}>
@@ -96,6 +107,9 @@ class Index extends React.Component {
               Total Cost
             </Text>
             <Text style={{fontSize: 24}}>${this.renderRoundedNumber(this.state.subTotal)}</Text>
+            <Text>
+              ¥ {this.renderRoundedNumber((this.state.rmbCost) || 0)}
+            </Text>
           </View>
           <View style={styles.tallyView}>
             <Text style={{fontWeight: 'bold'}}>
@@ -106,6 +120,15 @@ class Index extends React.Component {
               {this.renderRoundedNumber((this.state.profit * 100.0 / this.state.subTotal) || 0)}%
             </Text>
           </View>
+        </View>
+        <View style={{flex: 1, flexDirection: "row", alignItems: 'center', paddingLeft: 10}}>
+          <Text>RMB/US rate</Text>
+            <TextInput
+              style={{borderColor: '#eeeeee', borderWidth: 1, padding: 10, marginLeft: 5, width: 75, height: 36}}
+              placeholder='6'
+              autoCorrect={false}
+              keyboardType='decimal-pad'
+              onChangeText={text => this.setState({exchangeRate: parseFloat(text || this.exchangeRate)},this.calculateBalances)} />
         </View>
       </View>
     )
@@ -129,8 +152,9 @@ var styles = StyleSheet.create({
     borderTopColor: '#999',
     borderTopWidth: 2,
     padding: 10,
+    paddingBottom: 0,
     margin: 10,
-    marginBottom: 20,
+    marginBottom: 0,
   },
   tallyView: {
     textAlign: 'left',
