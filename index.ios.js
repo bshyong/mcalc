@@ -25,11 +25,11 @@ class TextInputWithLabel extends React.Component {
 class Index extends React.Component {
   constructor(props) {
     super(props)
-    this.exchangeRate = 6.0
+    this.exchangeRate = 6.2
     this.state = {
       cost: 0,
       shipping: 0,
-      taxRate: 0,
+      taxRate: 9.125,
       subTotal: 0,
       listingPrice: 0,
       profit: 0,
@@ -70,15 +70,11 @@ class Index extends React.Component {
             <Text style={{textAlign: 'center'}}>${this.renderRoundedNumber(this.state.cost)}</Text>
             <Text style={{textAlign: 'center'}}>¥{this.renderRmbAmount(this.state.cost)}</Text>
           </TextInputWithLabel>
-          <TextInputWithLabel label="Tax Rate %" width={75}>
-            <TextInput
-              style={styles.textfield}
-              placeholder=''
-              autoCorrect={false}
-              keyboardType='decimal-pad'
-              onChangeText={text => this.setState({taxRate: parseFloat(text || 0)},this.calculateBalances)} />
-            <Text style={{textAlign: 'center'}}>${this.renderRoundedNumber(this.state.tax)}</Text>
-            <Text style={{textAlign: 'center'}}>¥{this.renderRmbAmount(this.state.tax)}</Text>
+          <TextInputWithLabel label="Tax" width={75}>
+            <View style={{borderTopWidth: 1, borderColor: '#eeeeee'}}>
+              <Text style={{textAlign: 'center'}}>${this.renderRoundedNumber(this.state.tax)}</Text>
+              <Text style={{textAlign: 'center'}}>¥{this.renderRmbAmount(this.state.tax)}</Text>
+            </View>
           </TextInputWithLabel>
           <TextInputWithLabel label="Shipping" width={75}>
             <TextInput
@@ -121,14 +117,27 @@ class Index extends React.Component {
             </Text>
           </View>
         </View>
-        <View style={{flex: 1, flexDirection: "row", alignItems: 'center', paddingLeft: 10}}>
-          <Text>RMB/US rate</Text>
-            <TextInput
-              style={{borderColor: '#eeeeee', borderWidth: 1, padding: 10, marginLeft: 5, width: 75, height: 36}}
-              placeholder='6'
-              autoCorrect={false}
-              keyboardType='decimal-pad'
-              onChangeText={text => this.setState({exchangeRate: parseFloat(text || this.exchangeRate)},this.calculateBalances)} />
+        <View style={{flex: 1, flexDirection: "row", alignItems: 'center', paddingLeft: 10, justifyContent: 'space-between'}}>
+          <View>
+              <Text>RMB/US rate</Text>
+              <TextInput
+                style={{borderColor: '#eeeeee', borderWidth: 1, padding: 10, marginLeft: 5, width: 75, height: 36}}
+                placeholder='6.2'
+                autoCorrect={false}
+                keyboardType='decimal-pad'
+                onChangeText={text => this.setState({exchangeRate: parseFloat(text || this.exchangeRate)},this.calculateBalances)} />
+            </View>
+            <View>
+              <TextInputWithLabel label="Tax Rate %" width={75}>
+                <TextInput
+                  style={styles.textfield}
+                  placeholder=''
+                  autoCorrect={false}
+                  keyboardType='decimal-pad'
+                  placeholder='9.125'
+                  onChangeText={text => this.setState({taxRate: parseFloat(text || 0)},this.calculateBalances)} />
+              </TextInputWithLabel>
+          </View>
         </View>
       </View>
     )
@@ -157,7 +166,6 @@ var styles = StyleSheet.create({
     marginBottom: 0,
   },
   tallyView: {
-    textAlign: 'left',
     padding: 5
   },
   container: {
@@ -168,7 +176,6 @@ var styles = StyleSheet.create({
   navBar: {
     flex: 1,
     justifyContent: 'center',
-    color: '#333333',
   },
 });
 
@@ -178,7 +185,7 @@ class mCalc extends React.Component {
       <React.NavigatorIOS
         style={styles.navBar}
         initialRoute={{
-          title: 'm',
+          title: 'Maggie',
           component: Index,
         }} />
     )
